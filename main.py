@@ -1,5 +1,6 @@
 import json
 import requests
+import pandas as pd
 
 with open("credentials.json") as f:
     creds = json.load(f)
@@ -25,5 +26,13 @@ headers = {"Authorization": f"Bearer {token}"}
 response = requests.get(url, headers=headers)
 flights = response.json()
 
-print("✈️ Number of flights:", len(flights["states"]))
-print("First entry:", flights["states"][0])
+columns = [
+    "icao24", "callsign", "origin_country", "time_position", "last_contact",
+    "longitude", "latitude", "baro_altitude", "on_ground", "velocity",
+    "true_track", "vertical_rate", "sensors", "geo_altitude", "squawk",
+    "spi", "position_source"
+]
+
+df = pd.DataFrame(data["states"], columns=columns)
+
+print(df.head())

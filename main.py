@@ -9,16 +9,16 @@ with open("credentials.json") as f:
 
 auth_url = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token"
 
-data = {
+auth_data = {
     "grant_type": "client_credentials",
     "client_id": client_id,
     "client_secret": client_secret
 }
 
-response = requests.post(auth_url, data=data)
+response = requests.post(auth_url, data=auth_data)
 
-data = response.json()
-token = data["access_token"]
+token_data = response.json()
+token = token_data["access_token"]
 
 url = "https://opensky-network.org/api/states/all?lamin=37&lomin=-123&lamax=38&lomax=-122"
 headers = {"Authorization": f"Bearer {token}"}
@@ -33,6 +33,11 @@ columns = [
     "spi", "position_source"
 ]
 
-df = pd.DataFrame(data["states"], columns=columns)
+df = pd.DataFrame(flights["states"], columns=columns)
 
-print(df.head())
+goaround_df = pd.read_csv("data/go_arounds_augmented.csv")
+sfo_df = goaround_df[goaround_df["airport"] == "KSFO"]
+sfo_df.to_csv("data/sfo_goarounds.csv", index=False)
+
+print(sfo_df["has_ga"].value_counts())
+print("Saved file shape:", sfo_df.shape)
